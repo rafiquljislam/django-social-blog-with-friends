@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Add-Friend{% endblock title %}
+{% block content %}
+
+<div class="container my-2">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            {% for friend in friends %}
+                <div class="single my-2">
+
+                <table class='table'>
+                    <tr>
+                        <td>
+                            <img class="w-25" src="{{ friend.profile.image.url }}" alt="{{ friend.username }}">
+                            {{ friend.username }}
+                        </td>
+                        <td>
+                            <a href="{% url 'send_friend_request' friend.id %}" class="btn btn-sm btn-info">Add Friend</a>
+                        </td>                        
+                    </tr>
+                </table>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock content %}

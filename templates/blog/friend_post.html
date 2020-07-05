@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Friend-Post-Page{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+
+
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-md-8">
+        {% for post in posts %}
+            <div class="card my-2">
+                <div class="card-header">                    
+                    <a href="{% url 'friend_profile' post.user.id %}"><img class='float-left' style="width: 60px; border-radius: 50%;" src="{{ post.user.image.url }}" alt=""></a>
+                    <p class="float-left mx-2"> <a class="badge badge-info" href="{% url 'friend_profile' post.user.id %}">{{ post.user }}</a>  On {{ post.create }}</p>
+                </div>
+                <div class="card-body">
+                    <div class="media">
+                       <img class="mr-3 w-25" src="{{ post.image.url }}" alt="">
+                        <div class="media-body">
+                            <a class="badge badge-pill badge-light" href="{% url 'Post_detail_view' post.id %}"><h5 class="mt-0">{{ post.title }}</h5></a>
+                            <p>{{ post.content }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="">
+                        <div class="likkkke float-left">
+                            <form action="{% url 'add_like' %}" method="post">
+                                {% csrf_token %}
+                                <input class="form-control" name='post_id' type="hidden" value='{{ post.id }}'>
+                                <input type="hidden" name="next" value="{% url 'friend_post' %}" />
+                                <button class='btn btn-info' type='submit'>Like({{ post.like }})</button>
+                                <button class='btn btn-danger' type='submit'>Unlike</button>
+                            </form>
+                        </div>
+                        <div class="commmmment float-right">
+                            <form class="form-inline" action="{% url 'add_comment' %}" method="post">
+                                {% csrf_token %}
+                                <input name='post_id' type="hidden" value='{{ post.id }}'>
+                                <input type="hidden" name="next" value="{% url 'friend_post' %}" />
+                                <input class="form-control" name="comment" type="text" >
+                                <button class='btn btn-info' type='submit'>Comment({{ post.comment_count }})</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    {% for comm in post.comment %}
+                        <div class="mt-4">
+                            <div class=''>
+                                <a href="{% url 'friend_profile' comm.user.id %}"><img class='' style="width: 60px; border-radius: 50%;" src="{{ comm.user.image.url }}" alt=""></a>
+                                <span  class="badge badge-info ml-2" >{{ comm.user }}</span>
+                                <span class=' ml-1'>{{ comm.create }}</span>
+                            </div>
+                            <div class="" style="margin-left: 54px !IMPORTANT; display: inline-block !important;">
+                                <div class="float-left">
+                                    <h5 class="">{{ comm.value }}</h5>
+                                </div>
+                                {% if comm.user == user.profile %}
+                                    <div class="float-right">
+                                        <form action="{% url 'delete_comment' %}" method="post">
+                                            {% csrf_token %}
+                                            <input name='comment_id' type="hidden" value='{{ comm.id }}'>
+                                            <input type="hidden" name="next" value="{% url 'friend_post' %}" />
+                                            <button type='submit' class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+{% endblock content %}

@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+
+
+<div class="container p-2">
+    <h1 class='text-center'>Wellcome to your Profile,<span class="text-info">{{ user.first_name }} {{ user.last_name }}</span></h1>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="imageee">
+                <img class='img-fluid rounded-circle w-50' src="{{ user.profile.image.url }}" alt="{{ user.username }}">
+            </div>
+            <div class="mt-2">
+                <table class='table table-bordered table-striped table-dark'>
+                    <tr>
+                        <td>Username</td>
+                        <td>{{ user.username }}</td>
+                    </tr>
+                    <tr>
+                        <td>First Name</td>
+                        <td>{{ user.first_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>First Name</td>
+                        <td>{{ user.last_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Bio</td>
+                        <td>{{ user.profile.bio }}</td>
+                    </tr>
+                    <tr>
+                        <td>Slug</td>
+                        <td>{{ user.profile.slug }}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Friend</td>
+                        <td>{{ user.profile.friend.all.count }}</td>
+                    </tr>
+                    <tr>
+                        <td>My Friends</td>
+                        <td>
+                            {% for friend in user.profile.friend.all %}
+                                    <li><a  class="badge badge-dark" href="#">{{ friend }}</a><a class='btn btn-danger my-1' href="{% url 'unfriend' friend.id %}">Unfriend</a></li>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Friend Request I Send</td>
+                        <td>
+                            {% for friend in request_i_send %}
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <p>{{ friend.to_user }}</p>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-danger" href="{% url 'cancel_friend_request' friend.to_user.id %}">Calncel</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Friend Request I Get</td>
+                        <td>
+                            {% for friend in request_i_get %}
+                            <table>
+                                <tr>
+                                    <td>
+                                        <p>{{ friend.from_user }}</p>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-info float-left" href="{% url 'accept_friend_request' friend.from_user.id %}">Accept</a>
+                                        <a class="btn btn-danger" href="{% url 'delete_friend_request' friend.from_user.id %}">Delete</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mt-5">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ u_form|crispy }}
+                    {{ p_form|crispy }}
+                    <button class="btn btn-info" type="submit">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="clearfix"></div>
+
+<!--Your Timeline-->
+<div class="container mt-2">
+    <h1 class="text-center">Your Timeline</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            {% for post in posts %}
+            <div class="card my-2">
+                <div class="card-header">                    
+                    <a href="#"><img class='float-left' style="width: 60px; border-radius: 50%;" src="{{ post.user.image.url }}" alt=""></a>
+                    <p class="float-left mx-2"> <a class="badge badge-info" href="#">{{ post.user }}</a>  On {{ post.create }}</p>
+                </div>
+                <div class="card-body">
+                    <div class="media">
+                       <img class="mr-3 w-25" src="{{ post.image.url }}" alt="">
+                        <div class="media-body">
+                            <a class="badge badge-pill badge-light" href="{% url 'Post_detail_view' post.id %}"><h5 class="mt-0">{{ post.title }}</h5></a>
+                            <p>{{ post.content }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="">
+                        <div class="likkkke float-left">
+                            <form action="{% url 'add_like' %}" method="post">
+                                {% csrf_token %}
+                                <input class="form-control" name='post_id' type="hidden" value='{{ post.id }}'>
+                                <input type="hidden" name="next" value="{% url 'profile' %}" />
+                                <button class='btn btn-info' type='submit'>Like({{ post.like }})</button>
+                                <button class='btn btn-danger' type='submit'>Unlike</button>
+                            </form>
+                        </div>
+                        <div class="commmmment float-right">
+                            <form class="form-inline" action="{% url 'add_comment' %}" method="post">
+                                {% csrf_token %}
+                                <input name='post_id' type="hidden" value='{{ post.id }}'>
+                                <input type="hidden" name="next" value="{% url 'profile' %}" />
+                                <input class="form-control" name="comment" type="text" >
+                                <button class='btn btn-info' type='submit'>Comment({{ post.comment_count }})</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    {% for comm in post.comment %}
+                        <div class="mt-4">
+                            <div class=''>
+                                <a href="#"><img class='' style="width: 60px; border-radius: 50%;" src="{{ comm.user.image.url }}" alt=""></a>
+                                <span  class="badge badge-info ml-2" >{{ comm.user }}</span>
+                                <span class=' ml-1'>{{ comm.create }}</span>
+                            </div>
+                            <div class="" style="margin-left: 54px !IMPORTANT; display: inline-block !important;">
+                                <div class="float-left">
+                                    <h5 class="">{{ comm.value }}</h5>
+                                </div>
+                                {% if comm.user == user.profile %}
+                                    <div class="float-right">
+                                        <form action="{% url 'delete_comment' %}" method="post">
+                                            {% csrf_token %}
+                                            <input name='comment_id' type="hidden" value='{{ comm.id }}'>
+                                            <input type="hidden" name="next" value="{% url 'profile' %}" />
+                                            <button type='submit' class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock content %}

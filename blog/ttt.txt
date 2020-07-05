@@ -1,0 +1,35 @@
+
+>>> from user.models import Profile
+>>> from django.contrib.auth.models import User
+>>> 
+>>> user= User.objects.get(id=1)
+>>> user
+<User: rafiq>
+>>> Profile.objects.filter(profile__friend__user=user)
+<QuerySet [<Profile: rafiq>, <Profile: shifa>, <Profile: rafiq>, <Profile: jubayer>]>
+>>> 
+
+
+
+>>> from django.contrib.auth.models import User
+>>> from blog.models import Post
+
+user=User.objects.get(id=1)
+>>> Post.objects.filter(user__friend__user=user)
+<QuerySet [<Post: post 3--jubayer>, <Post: Post 4--jubayer>]>
+>>> 
+
+
+
+
+
+
+>>> from blog.models import Post
+>>> from blog.models import Comment
+>>> post = Post.objects.get(id=6)
+>>> from django.contrib.auth.models import User
+>>> user = User.objects.get(id=1)
+>>> u= user.profile
+>>> value = 'nice'
+>>> Comment.objects.create(post=post,user=u,value=value)
+<Comment: shifa 1--shifa--rafiq--nice>
